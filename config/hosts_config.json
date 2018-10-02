@@ -1,0 +1,10 @@
+{
+  "host_entries": [
+    {
+      "address_type": "local",
+      "addresses": [
+        { "address": "rs" }
+      ]
+    }
+  ]
+}
