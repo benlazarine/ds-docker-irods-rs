@@ -56,17 +56,17 @@ seconds past the minute. The _latest_ tag will point to the most recent build.
 
 ```bash
 prompt> date -u
-Tue Dec 19 17:21:45 UTC 2017
+Thu Oct  4 17:31:13 UTC 2018
 
 prompt> ./build
 
 prompt> docker images
-REPOSITORY                    TAG                   IMAGE ID            CREATED              SIZE
-cyverse/ds-irods-rs-onbuild   2017-12-19T17-21-46   56654afeedbf        9 seconds ago       457MB
-cyverse/ds-irods-rs-onbuild   latest                56654afeedbf        9 seconds ago       457MB
-irods-dev-build               4.1.10-centos7        82b9967cb458        About a minute ago   719MB
-irods-plugin-build            4.1.10-centos7        4565bc1db9fe        3 minutes ago        730MB
-centos                        7                     3fa822599e10        2 weeks ago          204MB
+REPOSITORY                    TAG                   IMAGE ID            CREATED             SIZE
+cyverse/ds-irods-rs-onbuild   2018-10-04T17-31-34   173d2520be37        6 seconds ago       455MB
+cyverse/ds-irods-rs-onbuild   latest                173d2520be37        6 seconds ago       455MB
+irods-dev-build               4.1.10-centos7        4bb3f8ba5f7a        2 minutes ago       689MB
+irods-plugin-build            4.1.10-centos7        c9c136645a08        3 minutes ago       700MB
+centos                        7                     5182e96772bf        8 weeks ago         200MB
 ```
 
 ## Repository Dependencies
