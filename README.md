@@ -20,26 +20,51 @@ constraints.
 The container logic consists of two image layers. The base image holds all of
 the logic common to all Data Store resource servers. The top level image holds
 all of the logic that is specific to the resource server inside the container.
-The base image will be hosted on Docker Hub in the `cyverse` repository.
+This repository provides the source for the base image. At some point it will be
+hosted on Docker Hub in the `cyverse` repository.
 
-All of the sensitive information that would normally be set in the iRODS
-configuration files as well as the clerver password have been removed. They must
-be provided in a file named `cyverse-secrets.env` that will be loaded at run
-time.
+The base image requires several Docker configuration values that need to be
+defined at either the build time of a derivative image or the run time of a
+container. The ones that need to be defined at build time should be provided as
+build arguments, while the ones that need to be defined at run time should be
+provided as environment variables.
 
-docker-compose was chosen as the tool to manage the building of the top level
-image as well as starting and stopping its container instance.
+Here are the required build arguments.
 
-```bash
-prompt> docker-compose build
-prompt> docker-compose up -d
-```
+Build Argument               | Required | Default       | Description
+---------------------------- | -------- | ------------- | -----------
+`CYVERSE_DS_CLERVER_USER`    | no       | ipc_admin     | the name of the rodsadmin user representing the resource server within the zone
+`CYVERSE_DS_DEFAULT_RES`     | no       | CyVerseRes    | the name of the resource to use by default during direct client connnections to this resource server
+`CYVERSE_DS_HOST_UID`        | no       |               | the UID of the hosting server to run iRODS as instead of the default user defined in the container
+`CYVERSE_DS_RES_SERVER`      | yes      |               | the FQDN or address used by the rest of the grid to communicate with this server
+`CYVERSE_DS_STORAGE_RES`     | yes      |               | the name of the unix file system resource that will be served
 
-If for some reason a base image upgrade doesn't work, the resource server can be
-reverted to the last good base image by modifying the Dockerfile to use the tag
-of the good image. Used the commands above to redeploy the reverted resource
-server.
+Here are the required environment variables.
 
+Environment Variable           | Description
+------------------------------ | -----------
+`CYVERSE_DS_CLERVER_PASSWORD`  | the password used to authenticate `CYVERSE_DS_CLERVER_USER`
+`CYVERSE_DS_CONTROL_PLANE_KEY` | the encryption key required for communicating over the relevant iRODS grid control plane
+`CYVERSE_DS_NEGOTIATION_KEY`   | the encryption key shared by the iplant zone for advanced negotiation during client connections
+`CYVERSE_DS_ZONE_KEY`          | the shared secret used during server-to-server communication
+
+The base image provides following volumes that should be mapped to a container
+host's filesystem.
+
+Volume                                 | Description
+-------------------------------------- | -----------
+`/irods_vault/$CYVERSE_DS_STORAGE_RES` | This is the vault holding the files served by the contained resource server. `$CYVERSE_DS_STORAGE_RES` is the build argument mentioned above.
+`/var/lib/irods/iRODS/server/log`      | This is the location where the log files will be written.
+`/var/lib/irods/iRODS/server/log/proc` | This is the location where agent PID files are kept. It should be mounted as a `tmpfs`.
+
+The base image exposes the following IP ports.
+
+Port(s)         | Purpose
+--------------- | -------
+1247/tcp        | This is the port used for iRODS zone communication, both client-server and server-server.
+1248/tcp        | This is the port used for iRODS grid communication.
+20000-20009/tcp | This is the ephemeral port range used for parallel transfers and client reconnections.
+20000-20009/udp | This is the ephemeral port range used for RBUDP based file transfers.
 
 ## Building the Base Image
 
