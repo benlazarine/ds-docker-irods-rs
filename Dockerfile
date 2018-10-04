@@ -18,7 +18,7 @@ RUN rpmkeys --import file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
         /tmp/irods-microservice-plugin-netcdf-1.0-centos7.rpm && \
     yum --assumeyes clean all && \
     rm --force --recursive /tmp/* /var/cache/yum && \
-    mkdir --parents /var/lib/irods/.irods
+    mkdir --parents /var/lib/irods/.irods /irods_vault
 
 ADD https://raw.githubusercontent.com/cyverse/ds-playbooks/master/irods/files/cmd-common/calliope-ingest \
     https://raw.githubusercontent.com/cyverse/ds-playbooks/master/irods/files/cmd-common/de-archive-data \
@@ -77,18 +77,18 @@ ENTRYPOINT [ "/entrypoint" ]
 # These need to be provided at the build time of a derived container
 ONBUILD ARG CYVERSE_DS_CLERVER_USER=ipc_admin
 ONBUILD ARG CYVERSE_DS_DEFAULT_RES=CyVerseRes
-ONBUILD ARG CYVERSE_DS_HOST_UID=
-ONBUILD ARG CYVERSE_DS_CONTAINER_VAULT
+ONBUILD ARG CYVERSE_DS_HOST_UID
 ONBUILD ARG CYVERSE_DS_RES_SERVER
 ONBUILD ARG CYVERSE_DS_STORAGE_RES
 
 ONBUILD RUN /on-build-instantiate && \
-            mkdir --parents "$CYVERSE_DS_CONTAINER_VAULT" && \
+            mkdir /irods_vault/"$CYVERSE_DS_STORAGE_RES" && \
             chown --recursive \
-                  irods:irods "$CYVERSE_DS_CONTAINER_VAULT" /etc/irods /var/lib/irods/.irods && \
-            chmod g+w "$CYVERSE_DS_CONTAINER_VAULT" && \
+                  irods:irods \
+                  /irods_vault/"$CYVERSE_DS_STORAGE_RES" /etc/irods /var/lib/irods/.irods && \
+            chmod g+w /irods_vault/"$CYVERSE_DS_STORAGE_RES" && \
             rm --force /on-build-instantiate
 
-ONBUILD VOLUME "$CYVERSE_DS_CONTAINER_VAULT"
+ONBUILD VOLUME /irods_vault/"$CYVERSE_DS_STORAGE_RES"
 
 ONBUILD USER irods-host-user
