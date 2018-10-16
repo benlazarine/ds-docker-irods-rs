@@ -10,16 +10,34 @@
 readonly ExecName=$(readlink --canonicalize "$0")
 readonly BaseDir=$(dirname "$ExecName")
 
+readonly ImageName=cyverse/ds-irods-rs-onbuild
+
 
 main()
 {
   local tag
   tag=$(date --utc '+%Y-%m-%dT%H-%M-%S')
 
+  docker pull "$ImageName":latest
+
+  local lastId
+  lastId=$(docker image inspect "$ImageName":latest | jq .[0].Id)
+
   "$BaseDir"/irods-netcdf-build/build centos7
   "$BaseDir"/irods-setavu-plugin/build centos7
-  docker build --tag cyverse/ds-irods-rs-onbuild "$BaseDir"
-  docker tag cyverse/ds-irods-rs-onbuild:latest cyverse/ds-irods-rs-onbuild:"$tag"
+  docker build --tag "$ImageName":"$tag" "$BaseDir"
+
+  local currentId
+  currentId=$(docker image inspect "$ImageName":"$tag" | jq .[0].Id)
+
+  if [ "$currentId" != "$lastId" ]
+  then
+    docker tag "$ImageName":"$tag" "$ImageName":latest
+    docker push "$ImageName":"$tag"
+    docker push "$ImageName":latest
+  else
+    docker rmi "$ImageName":"$tag"
+  fi
 }
 
 

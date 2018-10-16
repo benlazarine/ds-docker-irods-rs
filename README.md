@@ -1,7 +1,8 @@
 # ds-docker-irods-rs
 
 A docker image intended to be a base image for an iRODS resource server
-configured for the CyVerse Data Store.
+configured for the CyVerse Data Store. It creates the image that can be found on
+dockerhub at `cyverse/ds-irods-rs-onbuild`.
 
 ## Design
 
@@ -20,8 +21,8 @@ constraints.
 The container logic consists of two image layers. The base image holds all of
 the logic common to all Data Store resource servers. The top level image holds
 all of the logic that is specific to the resource server inside the container.
-This repository provides the source for the base image. At some point it will be
-hosted on Docker Hub in the `cyverse` repository.
+This repository provides the source for the base image. The images are hosted on
+dockerhub at `cyverse/ds-irods-rs-onbuild`.
 
 The base image requires several Docker configuration values that need to be
 defined at either the build time of a derivative image or the run time of a
@@ -68,7 +69,7 @@ Port(s)         | Purpose
 
 ## Building the Base Image
 
-The base image is named _cyverse/ds-irods-rs-onbuild_. The command `./build` can
+The base image is named `cyverse/ds-irods-rs-onbuild`. The command `./build` can
 be used to build it.
 
 Each time an image is built, it is tagged with the UTC time when the build
