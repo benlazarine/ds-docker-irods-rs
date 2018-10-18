@@ -14,8 +14,6 @@
 #
 # CYVERSE_DS_CLERVER_USER     the name of the rodsadmin user representing the
 #                             resource server within the zone
-# CYVERSE_DS_CONTAINER_VAULT  the directory inside the container iRODS will use
-#                             as its vault
 # CYVERSE_DS_DEFAULT_RES      the name of coordinating resource this server will
 #                             use by default
 # CYVERSE_DS_HOST_UID         (optional) the UID of the hosting server to run
@@ -34,7 +32,7 @@ main()
     /etc/irods/hosts_config.json
 
   jq_in_place \
-    ".default_resource_directory |= \"$CYVERSE_DS_CONTAINER_VAULT\" |
+    ".default_resource_directory |= \"/irods_vault/$CYVERSE_DS_STORAGE_RES\" |
      .default_resource_name      |= \"$CYVERSE_DS_DEFAULT_RES\" |
      .zone_user                  |= \"$CYVERSE_DS_CLERVER_USER\"" \
     /etc/irods/server_config.json
