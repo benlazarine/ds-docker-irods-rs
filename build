@@ -7,6 +7,8 @@
 # for CyVerse Data Store resource server images. Each build is tagged with the
 # number ISO 8601 style build time.
 
+set -e
+
 readonly ExecName=$(readlink --canonicalize "$0")
 readonly BaseDir=$(dirname "$ExecName")
 
@@ -23,9 +25,15 @@ main()
   local lastId
   lastId=$(docker image inspect "$ImageName":latest | jq .[0].Id)
 
+  docker build --file irods-rs.dockerfile --tag cyverse/irods-rs:4.1.10 "$BaseDir"/irods-rs
   "$BaseDir"/irods-netcdf-build/build centos7
+  cp "$BaseDir"/irods-netcdf-build/packages/centos7/*.rpm "$BaseDir"/cyverse-rs/plugins/
   "$BaseDir"/irods-setavu-plugin/build centos7
-  docker build --tag "$ImageName":"$tag" "$BaseDir"
+
+  cp "$BaseDir"/irods-setavu-plugin/libraries/centos7/libmsiSetAVU.so \
+     "$BaseDir"/cyverse-rs/plugins/
+
+  docker build --file cyverse-rs.dockerfile --tag "$ImageName":"$tag" "$BaseDir"/cyverse-rs
 
   local currentId
   currentId=$(docker image inspect "$ImageName":"$tag" | jq .[0].Id)
@@ -41,5 +49,4 @@ main()
 }
 
 
-set -e
 main
