@@ -16,7 +16,7 @@ ipc_MAX_NUM_RE_PROCS : integer
 ipc_MAX_NUM_RE_PROCS = 12
 
 ipc_RE_HOST : string
-ipc_RE_HOST = 'data.cyverse.org'
+ipc_RE_HOST = 'ares.iplantcollaborative.org'
 
 ipc_ZONE : string
 ipc_ZONE = 'iplant'

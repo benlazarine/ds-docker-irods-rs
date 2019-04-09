@@ -13,7 +13,7 @@
   "default_hash_scheme": "MD5",
   "environment_variables": {},
   "federation": [],
-  "icat_host": "data.cyverse.org",
+  "icat_host": "ares.iplantcollaborative.org",
   "match_hash_policy": "compatible",
   "re_data_variable_mapping_set": [
     { "filename": "core" }
