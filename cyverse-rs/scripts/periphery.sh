@@ -56,13 +56,13 @@ set_resource_status()
 set_server_secrets()
 {
   jq_in_place \
-    ".irods_server_control_plane_key |= \"$CYVERSE_DS_CONTROL_PLANE_KEY\"" \
+    ".irods_server_control_plane_key |= \"$IRODS_CONTROL_PLANE_KEY\"" \
     /var/lib/irods/.irods/irods_environment.json
 
   jq_in_place \
-    ".negotiation_key          |= \"$CYVERSE_DS_NEGOTIATION_KEY\" |
-     .server_control_plane_key |= \"$CYVERSE_DS_CONTROL_PLANE_KEY\" |
-     .zone_key                 |= \"$CYVERSE_DS_ZONE_KEY\"" \
+    ".negotiation_key          |= \"$IRODS_NEGOTIATION_KEY\" |
+     .server_control_plane_key |= \"$IRODS_CONTROL_PLANE_KEY\" |
+     .zone_key                 |= \"$IRODS_ZONE_KEY\"" \
     /etc/irods/server_config.json
 }
 

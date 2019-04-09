@@ -32,29 +32,29 @@ provided as environment variables.
 
 Here are the required build arguments.
 
-Build Argument               | Required | Default       | Description
----------------------------- | -------- | ------------- | -----------
-`CYVERSE_DS_CLERVER_USER`    | no       | ipc_admin     | the name of the rodsadmin user representing the resource server within the zone
-`CYVERSE_DS_DEFAULT_RES`     | no       | CyVerseRes    | the name of the resource to use by default during direct client connnections to this resource server
-`CYVERSE_DS_HOST_UID`        | no       |               | the UID of the hosting server to run iRODS as instead of the default user defined in the container
-`CYVERSE_DS_RES_SERVER`      | yes      |               | the FQDN or address used by the rest of the grid to communicate with this server
-`CYVERSE_DS_STORAGE_RES`     | yes      |               | the name of the unix file system resource that will be served
+Build Argument          | Required | Default       | Description
+----------------------- | -------- | ------------- | -----------
+`IRODS_CLERVER_USER`    | no       | ipc_admin     | the name of the rodsadmin user representing the resource server within the zone
+`IRODS_DEFAULT_RES`     | no       | CyVerseRes    | the name of the resource to use by default during direct client connnections to this resource server
+`IRODS_HOST_UID`        | no       |               | the UID of the hosting server to run iRODS as instead of the default user defined in the container
+`IRODS_RES_SERVER`      | yes      |               | the FQDN or address used by the rest of the grid to communicate with this server
+`IRODS_STORAGE_RES`     | yes      |               | the name of the unix file system resource that will be served
 
 Here are the required environment variables.
 
-Environment Variable           | Description
------------------------------- | -----------
-`CYVERSE_DS_CLERVER_PASSWORD`  | the password used to authenticate `CYVERSE_DS_CLERVER_USER`
-`CYVERSE_DS_CONTROL_PLANE_KEY` | the encryption key required for communicating over the relevant iRODS grid control plane
-`CYVERSE_DS_NEGOTIATION_KEY`   | the encryption key shared by the iplant zone for advanced negotiation during client connections
-`CYVERSE_DS_ZONE_KEY`          | the shared secret used during server-to-server communication
+Environment Variable      | Description
+------------------------- | -----------
+`IRODS_CLERVER_PASSWORD`  | the password used to authenticate `IRODS_CLERVER_USER`
+`IRODS_CONTROL_PLANE_KEY` | the encryption key required for communicating over the relevant iRODS grid control plane
+`IRODS_NEGOTIATION_KEY`   | the encryption key shared by the iplant zone for advanced negotiation during client connections
+`IRODS_ZONE_KEY`          | the shared secret used during server-to-server communication
 
 The base image provides following volumes that should be mapped to a container
 host's filesystem.
 
 Volume                                 | Description
 -------------------------------------- | -----------
-`/irods_vault/$CYVERSE_DS_STORAGE_RES` | This is the vault holding the files served by the contained resource server. `$CYVERSE_DS_STORAGE_RES` is the build argument mentioned above.
+`/irods_vault/$IRODS_STORAGE_RES`      | This is the vault holding the files served by the contained resource server. `$IRODS_STORAGE_RES` is the build argument mentioned above.
 `/var/lib/irods/iRODS/server/log`      | This is the location where the log files will be written.
 `/var/lib/irods/iRODS/server/log/proc` | This is the location where agent PID files are kept. It should be mounted as a `tmpfs`.
 
