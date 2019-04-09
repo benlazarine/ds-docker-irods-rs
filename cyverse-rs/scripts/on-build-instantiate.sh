@@ -7,18 +7,18 @@
 #
 # To allow iRODS to run as a non-root user and still mount volumes, this script
 # allows for the ability to run iRODS with as a user from the docker host
-# server. To do this, set the environment variable IRODS_HOST_UID to the UID of 
+# server. To do this, set the environment variable IRODS_HOST_UID to the UID of
 # the host user to run iRODS as.
 #
 # This program expects the following environment variables to be defined.
 #
-# IRODS_CLERVER_USER  the name of the rodsadmin user representing the resource 
+# IRODS_CLERVER_USER  the name of the rodsadmin user representing the resource
 #                     server within the zone
-# IRODS_DEFAULT_RES   the name of coordinating resource this server will use by 
+# IRODS_DEFAULT_RES   the name of coordinating resource this server will use by
 #                     default
-# IRODS_HOST_UID      (optional) the UID of the hosting server to run iRODS as 
+# IRODS_HOST_UID      (optional) the UID of the hosting server to run iRODS as
 #                     instead of the default user defined in the container
-# IRODS_RES_SERVER    the FQDN or address used by the rest of the grid to 
+# IRODS_RES_SERVER    the FQDN or address used by the rest of the grid to
 #                     communicate with this server
 # IRODS_STORAGE_RES   the unix file system resource to server
 
@@ -45,7 +45,6 @@ main()
     ".irods_cwd              |= \"/iplant/home/$IRODS_CLERVER_USER\" |
      .irods_default_resource |= \"$IRODS_DEFAULT_RES\" |
      .irods_home             |= \"/iplant/home/$IRODS_CLERVER_USER\" |
-     .irods_host             |= \"$IRODS_RES_SERVER\" |
      .irods_user_name        |= \"$IRODS_CLERVER_USER\"" \
     /var/lib/irods/.irods/irods_environment.json
 
