@@ -36,20 +36,8 @@ set_resource_status()
 {
   local status="$1"
 
-  local rescLoc
-  rescLoc=$(hostname)
-
-  local resc
-  for resc in $(iquest '%s' "SELECT RESC_NAME WHERE RESC_LOC = '$rescLoc'")
-  do
-    if [[ "$resc" =~ ^CAT_NO_ROWS_FOUND ]]
-    then
-      break
-    fi
-
-    printf 'bringing %s %s\n' "$resc" "$status"
-    iadmin modresc "$resc" status "$status"
-  done
+  printf 'bringing %s %s\n' "$IRODS_STORAGE_RES" "$status"
+  iadmin modresc "$IRODS_STORAGE_RES" status "$status"
 }
 
 
