@@ -12,13 +12,13 @@
 
 set -e
 
-PeripheryExec=
-TailPid=
+declare PeripheryExec
+declare TailPid
 
 
 main()
 {
-  if [ "$#" -ge 1 ]
+  if [[ "$#" -ge 1 ]]
   then
     PeripheryExec="$*"
   fi
@@ -35,7 +35,7 @@ call_periphery()
 {
   local cmd="$1"
 
-  if [ -n "$PeripheryExec" ]
+  if [[ -n "$PeripheryExec" ]]
   then
     eval "$PeripheryExec" "$cmd"
   fi
@@ -74,7 +74,7 @@ stop_server()
   /var/lib/irods/iRODS/irodsctl stop
   call_periphery after_stop
 
-  if [ -n "$TailPid" ]
+  if [[ -n "$TailPid" ]]
   then
     if kill "$TailPid" 2> /dev/null
     then
