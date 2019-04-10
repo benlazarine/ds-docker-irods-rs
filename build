@@ -17,8 +17,6 @@ readonly ExecPath=$(readlink --canonicalize "$0")
 readonly ExecName=$(basename "$ExecPath")
 readonly BaseDir=$(dirname "$ExecPath")
 
-readonly ImageName=cyverse/ds-irods-rs-onbuild
-
 
 main()
 {
@@ -54,44 +52,64 @@ main()
   local tag
   tag=$(date --utc '+%Y-%m-%dT%H-%M-%S')
 
-  docker pull "$ImageName":latest
+  build_irods_rs
+  build_cyverse_rs_prereqs
+  build_image ds-irods-rs-onbuild latest "$tag" "$push"
+}
 
-  local lastId
-  lastId=$(docker image inspect "$ImageName":latest | jq .[0].Id)
 
-  build_images "$tag"
+build_cyverse_rs_prereqs()
+{
+  "$BaseDir"/irods-netcdf-build/build centos7
+  cp "$BaseDir"/irods-netcdf-build/packages/centos7/*.rpm "$BaseDir"/ds-irods-rs-onbuild/plugins/
+
+  "$BaseDir"/irods-setavu-plugin/build centos7
+
+  cp "$BaseDir"/irods-setavu-plugin/libraries/centos7/libmsiSetAVU.so \
+     "$BaseDir"/ds-irods-rs-onbuild/plugins/
+}
+
+
+build_image()
+{
+  local name="$1"
+  local currentTag="$2"
+  local newTag="$3"
+  local push="$4"
+
+  local currentImage=cyverse/"$name":"$currentTag"
+  local newImage=cyverse/"$name":"$newTag"
+
+  docker pull "$currentImage"
+  docker build --file "$name".dockerfile --tag "$newImage" "$BaseDir"/"$name"
+
+  local latestId
+  latestId=$(docker image inspect "$currentImage" | jq .[0].Id)
 
   local newId
-  newId=$(docker image inspect "$ImageName":"$tag" | jq .[0].Id)
+  newId=$(docker image inspect "$newImage" | jq .[0].Id)
 
-  if [[ "$newId" != "$lastId" ]]
+  if [[ "$newId" != "$latestId" ]]
   then
-    docker tag "$ImageName":"$tag" "$ImageName":latest
+    docker tag "$newImage" "$currentImage"
 
     if [[ "$push" -ne 0 ]]
     then
-      docker push "$ImageName":"$tag"
-      docker push "$ImageName":latest
+      docker push "$newImage"
+      docker push "$currentImage"
     fi
   else
-    docker rmi "$ImageName":"$tag"
+    docker rmi "$newImage"
   fi
 }
 
 
-build_images()
+build_irods_rs()
 {
-  local tag="$1"
+  local name=irods-rs
+  local newTag=4.1.10
 
-  docker build --file irods-rs.dockerfile --tag cyverse/irods-rs:4.1.10 "$BaseDir"/irods-rs
-  "$BaseDir"/irods-netcdf-build/build centos7
-  cp "$BaseDir"/irods-netcdf-build/packages/centos7/*.rpm "$BaseDir"/cyverse-rs/plugins/
-  "$BaseDir"/irods-setavu-plugin/build centos7
-
-  cp "$BaseDir"/irods-setavu-plugin/libraries/centos7/libmsiSetAVU.so \
-     "$BaseDir"/cyverse-rs/plugins/
-
-  docker build --file cyverse-rs.dockerfile --tag "$ImageName":"$tag" "$BaseDir"/cyverse-rs
+  docker build --file "$name".dockerfile --tag cyverse/"$name":"$newTag" "$BaseDir"/"$name"
 }
 
 
