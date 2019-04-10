@@ -52,7 +52,7 @@ main()
   local tag
   tag=$(date --utc '+%Y-%m-%dT%H-%M-%S')
 
-  build_irods_rs
+  build_image irods-rs 4.1.10 4.1.10_"$tag" "$push"
   build_cyverse_rs_prereqs
   build_image ds-irods-rs-onbuild latest "$tag" "$push"
 }
@@ -80,7 +80,7 @@ build_image()
   local currentImage=cyverse/"$name":"$currentTag"
   local newImage=cyverse/"$name":"$newTag"
 
-  docker pull "$currentImage"
+  docker pull "$currentImage" 2> /dev/null || true
   docker build --file "$name".dockerfile --tag "$newImage" "$BaseDir"/"$name"
 
   local latestId
@@ -101,15 +101,6 @@ build_image()
   else
     docker rmi "$newImage"
   fi
-}
-
-
-build_irods_rs()
-{
-  local name=irods-rs
-  local newTag=4.1.10
-
-  docker build --file "$name".dockerfile --tag cyverse/"$name":"$newTag" "$BaseDir"/"$name"
 }
 
 
