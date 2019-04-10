@@ -1,22 +1,56 @@
 #!/bin/bash
 #
 # Usage:
-#  build
+#  build [options]
 #
 # This program builds the ds-irods-rs-onbuild image that forms the base image
 # for CyVerse Data Store resource server images. Each build is tagged with the
 # number ISO 8601 style build time.
+#
+# Options:
+#  -p, --push  push the new image to Dockerhub
+
 
 set -e
 
-readonly ExecName=$(readlink --canonicalize "$0")
-readonly BaseDir=$(dirname "$ExecName")
+readonly ExecPath=$(readlink --canonicalize "$0")
+readonly ExecName=$(basename "$ExecPath")
+readonly BaseDir=$(dirname "$ExecPath")
 
 readonly ImageName=cyverse/ds-irods-rs-onbuild
 
 
 main()
 {
+  local opts
+  if ! opts=$(getopt --longoptions push --name "$ExecName" --options p -- "$@")
+  then
+    printf 'failed to parse command line\n' >&2
+    return 1
+  fi
+
+  eval set -- "$opts"
+
+  local push=0
+
+  while true
+  do
+    case "$1" in
+      -p|--push)
+        push=1
+        shift
+        ;;
+      --)
+        shift
+        break
+        ;;
+      *)
+        printf 'unknown option: %s\n' "$1" >&2
+        return 1
+        ;;
+    esac
+  done
+
   local tag
   tag=$(date --utc '+%Y-%m-%dT%H-%M-%S')
 
@@ -24,6 +58,30 @@ main()
 
   local lastId
   lastId=$(docker image inspect "$ImageName":latest | jq .[0].Id)
+
+  build_images "$tag"
+
+  local newId
+  newId=$(docker image inspect "$ImageName":"$tag" | jq .[0].Id)
+
+  if [[ "$newId" != "$lastId" ]]
+  then
+    docker tag "$ImageName":"$tag" "$ImageName":latest
+
+    if [[ "$push" -ne 0 ]]
+    then
+      docker push "$ImageName":"$tag"
+      docker push "$ImageName":latest
+    fi
+  else
+    docker rmi "$ImageName":"$tag"
+  fi
+}
+
+
+build_images()
+{
+  local tag="$1"
 
   docker build --file irods-rs.dockerfile --tag cyverse/irods-rs:4.1.10 "$BaseDir"/irods-rs
   "$BaseDir"/irods-netcdf-build/build centos7
@@ -34,19 +92,7 @@ main()
      "$BaseDir"/cyverse-rs/plugins/
 
   docker build --file cyverse-rs.dockerfile --tag "$ImageName":"$tag" "$BaseDir"/cyverse-rs
-
-  local currentId
-  currentId=$(docker image inspect "$ImageName":"$tag" | jq .[0].Id)
-
-  if [ "$currentId" != "$lastId" ]
-  then
-    docker tag "$ImageName":"$tag" "$ImageName":latest
-    docker push "$ImageName":"$tag"
-    docker push "$ImageName":latest
-  else
-    docker rmi "$ImageName":"$tag"
-  fi
 }
 
 
-main
+main "$@"
