@@ -52,7 +52,6 @@ main()
   local tag
   tag=$(date --utc '+%Y-%m-%dT%H-%M-%S')
 
-  build_image irods-rs 4.1.10 4.1.10_"$tag" "$push"
   build_cyverse_rs_prereqs
   build_image ds-irods-rs-onbuild latest "$tag" "$push"
 }
