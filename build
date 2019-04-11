@@ -83,7 +83,7 @@ build_image()
   docker build --file "$name".dockerfile --tag "$newImage" "$BaseDir"/"$name"
 
   local latestId
-  latestId=$(docker image inspect "$currentImage" | jq .[0].Id)
+  latestId=$(docker image inspect "$currentImage" 2> /dev/null | jq .[0].Id)
 
   local newId
   newId=$(docker image inspect "$newImage" | jq .[0].Id)
